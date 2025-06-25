@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Arbitrage Nexus</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #1e3a8a, #6b7280);
+}
+.glow {
+    box-shadow: 0 0 30px rgba(99,102,241,0.25);
+}
+</style>
+</head>
+<body class="min-h-screen flex flex-col text-gray-100">
+<!-- Header -->
+<header class="bg-gray-900/80 backdrop-blur-lg py-6 text-center">
+    <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-500">
+        Arbitrage Nexus
+    </h1>
+</header>
+
+<!-- Main Content -->
+<main class="flex-grow container mx-auto p-4 flex justify-center">
+    <div class="bg-gray-800/70 rounded-3xl p-8 glow w-full max-w-2xl">
+        <form method="POST" class="space-y-6" id="arbitrage-form">
+            <div>
+                <label for="api_key" class="block text-sm font-medium text-gray-300">Exchange Rate API Key</label>
+                <input
+                    type="text"
+                    id="api_key"
+                    name="api_key"
+                    required
+                    placeholder="Enter your API key"
+                    value="{{ request.form.api_key if request.method == 'POST' else '' }}"
+                    class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-gray-600 text-white px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+                <p class="text-gray-400 text-sm mt-2">💡 Get your free API key from
+                    <a href="https://www.exchangerate-api.com/" target="_blank" class="text-indigo-400 underline">ExchangeRate-API</a>.
+                </p>
+            </div>
+
+            <div>
+                <label for="currencies" class="block text-sm font-medium text-gray-300">Currencies (Comma separated, e.g., USD, EUR, JPY)</label>
+                <input
+                    type="text"
+                    id="currencies"
+                    name="currencies"
+                    required
+                    value="{{ request.form.currencies if request.method == 'POST' else 'USD, EUR, JPY, GBP, CNY' }}"
+                    class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-gray-600 text-white px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+            </div>
+
+            <div>
+                <button
+                    id="submit-button"
+                    type="submit"
+                    class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 flex items-center justify-center"
+                >
+                    Find Arbitrage
+                </button>
+            </div>
+        </form>
+
+        <!-- Loading Spinner -->
+        <div id="loading" class="hidden flex justify-center items-center mt-4">
+            <div class="border-4 border-t-4 border-gray-300 border-t-indigo-600 rounded-full w-10 h-10 animate-spin"></div>
+            <span class="ml-3">Searching for arbitrage opportunities...</span>
+        </div>
+
+        {% if result is not none %}
+        <div class="results mt-8 p-6 rounded-xl bg-gray-900/50">
+            {% if result.path %}
+                <div class="flex items-center space-x-3">
+                    <span class="text-green-400 text-2xl">✅</span>
+                    <h2 class="text-xl font-semibold">Arbitrage Opportunity Found!</h2>
+                </div>
+                <p class="mt-3"><span class="font-medium">Cycle Path:</span> {{ result.path }}</p>
+                <p class="mt-1 {{ 'text-green-400' if result.profit|float > 0 else 'text-red-400' }}">
+                    <span class="font-medium">Profit Percentage:</span> {{ result.profit }}
+                </p>
+            {% else %}
+                <div class="flex items-center space-x-3">
+                    <span class="text-red-400 text-2xl">❌</span>
+                    <h2 class="text-xl font-semibold">No Arbitrage Detected</h2>
+                </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if error_message %}
+        <div class="mt-8 p-4 rounded-xl bg-red-900/50 text-red-300">
+            ⚠️ {{ error_message }}
+        </div>
+        {% endif %}
+
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-900/80 backdrop-blur-lg py-4 text-center">
+    <p class="text-sm text-gray-400">© 2025 Arbitrage Nexus. Powered by xAI.</p>
+</footer>
+
+<!-- Scripts -->
+<script>
+const form = document.getElementById('arbitrage-form');
+const loading = document.getElementById('loading');
+const submitButton = document.getElementById('submit-button');
+
+form?.addEventListener('submit', () => {
+    loading.classList.remove('hidden');
+    submitButton.disabled = true;
+});
+</script>
+</body>
+</html>
